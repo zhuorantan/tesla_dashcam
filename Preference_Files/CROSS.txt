@@ -13,9 +13,20 @@
 # Put clip info bottom left
 --halign LEFT --valign BOTTOM
 
-# Output event reason, event date/time, event city, # seconds till event, and date/time
---text_overlay_fmt "Reason: {event_reason}\nEvent: {event_timestamp}\nCity: {event_city}\nCountdown: {event_timestamp_countdown_rolling}\nDate/Time: {local_timestamp_rolling}"
+# Overlay video with text: event reason, event date/time, event city, # seconds till event, and date/time
+# If event reason or event city are empty then do not overlay the text on them
+# --text_overlay_fmt "{% if event_reason != '' %}Reason: {{event_reason}}\n{% endif %}Event: {{event_timestamp|timestamp_format}}\n{% if event_city != '' %}City: {{event_city}}\n{% endif %}Countdown: {{event_timestamp_countdown_rolling}}\nDate/Time: {{local_timestamp_rolling}}"
 
+--text_overlay_fmt >
+    {% if event_reason != '' %}
+        Reason: {{event_reason}}\n
+    {% endif %}
+    "\      Event: {{event_timestamp|timestamp_format}}\n"
+    {% if event_city != '' %}
+    "\      City: {{event_city}}\n"
+    {% endif %}
+    Countdown: {{event_timestamp_countdown_rolling}}\n
+    Date/Time: {{local_timestamp_rolling}}
 
 # Set timestamp format to: Weekday abbreviated, day (without leading zero) Month abbreviated Year at Hour:Minute:SecondAM(or PM)
 --timestamp_format "%a, %d %b %Y at %I:%M:%S%p"
@@ -35,11 +46,19 @@
 # Set the movie timestamp to SENTRY event
 --set_moviefile_timestamp SENTRY
 
-# Merge files together
---merge "{layout} {start_timestamp} - {event_reason} - {event_city}"
+# Store files in folder based on layout, subfolder year, subfolder month, subfolder event reason and event city, 
+# --merge is not provided and no extention hence each event is stored seperately with default filename
+--output >
+    ./Movies/{{layout}}/{{start_timestamp.strftime('%Y')}}/{{start_timestamp|timestamp_format('%m')}}/
+    {{ event_reason if event_reason != '' }}
+    {{'-' if event_reason != '' and event_city != '' }}
+    {{event_city if event_city != ''}}
 
-# --merge_timestamp_format "%Y-%m-%d"
---merge_timestamp_format "%Y-%m"
+# Use a temp folder to store files not being kept
+--temp_dir "./temp"
+
+# Set timestamp to be year/month
+# --output_timestamp_format "%Y-%m"
 
 # Create map
 --title_screen_map

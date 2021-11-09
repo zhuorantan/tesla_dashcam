@@ -2,7 +2,7 @@
 # tesla_dashcam <Location of video files> --output <Location to store encoded video files> @FULLSCREEN_REAR.txt
 
 # Skip if encoded file already exist.
---skip_existing
+# --skip_existing
 
 # Delete processed files when video file is encoded.
 # --delete_source
@@ -17,7 +17,13 @@
 --halign LEFT --valign TOP
 
 # Output reason for save, city, and rolling timestamp (each on new line)
---text_overlay_fmt "Saved Reason: {event_reason}\nCity: {event_city}\nDate/Time: {local_timestamp_rolling}"
+--text_overlay_fmt >
+  {% if event_reason != '' %}
+    Saved Reason: {{event_reason}}\n
+  {% endif %}
+  {% if event_city != '' %}City: {{event_city}}\n
+  {% endif %}
+  Date/Time: {{local_timestamp_rolling}}"
 
 # Fast forward through portions where there is no motion detected
 --motion_only
@@ -25,6 +31,8 @@
 # Encode with x265
 --encoding x265
 
-# Merge files together
---merge "{layout} {event_timestamp} - {event_reason} - {event_city}"
+# Store files in folders based on layout, subfolder processing start timestamp, --merge is not provided and no extention hence each event is stored seperately.
+--output "./Movies/{{layout}}_REAR/{{process_start_timestamp|timestamp_format}}"
 
+# Set timestamp to be year/month
+--timestamp_format "%Y-%m-%d_%H_%M"

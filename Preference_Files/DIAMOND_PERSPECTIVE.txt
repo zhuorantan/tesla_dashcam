@@ -2,7 +2,7 @@
 # tesla_dashcam <Location of video files> --output <Location to store encoded video files> @DIAMOND_PERSPECTIVE.txt
 
 # Skip if encoded file already exist.
---skip_existing
+# --skip_existing
 
 # Delete processed files when video file is encoded.
 # --delete_source
@@ -17,7 +17,7 @@
 --halign RIGHT --valign TOP
 
 # Output city and timestamp
---text_overlay_fmt "City: {event_city}\nDate/Time: {local_timestamp_rolling}"
+--text_overlay_fmt "{% if event_city != '' %}City: {{event_city}}\n{% endif %}Date/Time: {{local_timestamp_rolling}}"
 
 # Fast forward through portions where there is no motion detected
 --motion_only
@@ -30,3 +30,9 @@
 
 # Merge files together
 --merge
+
+# Use a temp folder to store files not being kept
+--temp_dir "./temp"
+
+# Store files in folder DIAMOND_PERSPECTIVE, --merge is provided so all events will be merged into 1 video file.
+--output "./Movies/DIAMOND_PERSPECTIVE"

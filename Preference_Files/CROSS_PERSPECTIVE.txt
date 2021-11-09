@@ -2,7 +2,7 @@
 # tesla_dashcam <Location of video files> --output <Location to store encoded video files> @CROSS_PERSPECTIVE.txt
 
 # Skip if encoded file already exist.
---skip_existing
+# --skip_existing
 
 # Delete processed files when video file is encoded.
 # --delete_source
@@ -17,7 +17,7 @@
 --halign LEFT --valign BOTTOM
 
 # Output city and rolling timestamp
---text_overlay_fmt "City: {event_city}\nDate/Time: {local_timestamp_rolling}"
+--text_overlay_fmt "{% if event_city != '' %}City: {{event_city}}\n{% endif %}Date/Time: {{local_timestamp_rolling}}"
 
 # Fast forward through portions where there is no motion detected
 --motion_only
@@ -34,11 +34,17 @@
 # Make it so that offset is only for Sentry and based on when the sentry event occurred.
 --sentry_offset
 
-# Merge files together
---merge "{layout} {event_timestamp} - {event_reason} - {event_city}"
+# Output
+# Store files in folders based on layout, subfolder event reason, extention is provided hence combine events into movies based on event city 
+# and year/month/day of event timestamp
+# Extention is provided resulting in events being merged accordingly.
+--output "./Movies/{{layout}}_PERSPECTIVE/{{ event_reason if event_reason != '' }}/{{ event_city ~ ' - ' if event_city != '' }}{{event_timestamp|timestamp_format}}.mp4"
+
+# Use a temp folder to store files not being kept
+--temp_dir "./temp"
 
 # Set timestamp to be year/month
---merge_timestamp_format "%Y-%m"
+--timestamp_format "%Y-%m-%d"
 
 # Create map
 --title_screen_map
