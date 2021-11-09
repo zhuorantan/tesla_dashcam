@@ -2,7 +2,7 @@
 # tesla_dashcam <Location of video files> --output <Location to store encoded video files> @FULLSCREEN.txt
 
 # Skip if encoded file already exist.
---skip_existing
+# --skip_existing
 
 # Delete processed files when video file is encoded.
 # --delete_source
@@ -14,7 +14,10 @@
 --halign LEFT --valign TOP
 
 # Output reason for save, city, and rolling timestamp (each on new line)
---text_overlay_fmt "Saved Reason: {event_reason}\nCity: {event_city}\nDate/Time: {local_timestamp_rolling}"
+--text_overlay_fmt >
+{{ 'Saved Reason:  ' ~ event_reason ~ '\n' if event_reason != '' }}
+{{ 'City: ' ~ event_city ~ '\n' if event_city != '' }}
+Date/Time: {{local_timestamp_rolling}}
 
 # Fast forward through portions where there is no motion detected
 --motion_only
@@ -22,8 +25,15 @@
 # Encode with x265
 --encoding x265
 
-# Merge files together
---merge "{layout} {end_timestamp} - {event_reason} - {event_city}"
+# Output
+# Store files in folders, extention is set thus hence group events based on end_timestamp (date/hour), event reason, event city
+--output "./Movies/{{layout}}/{{end_timestamp|timestamp_format('%Y-%m-%dT%H')}} - {{event_reason}} - {{event_city}}.mp4"
+
+# Keep the events and store them within subfolders based on the same name as the merged movie
+--output_event "./Movies/{{layout}}/{{end_timestamp|timestamp_format('%Y-%m-%dT%H')}} - {{event_reason}} - {{event_city}}"
+
+# Temp folder
+--temp_dir "./temp"
 
 # Create map
 --title_screen_map

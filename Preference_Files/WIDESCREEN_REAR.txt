@@ -2,7 +2,7 @@
 # tesla_dashcam <Location of video files> --output <Location to store encoded video files> @WIDESCREEN_REAR.txt
 
 # Skip if encoded file already exist.
---skip_existing
+# --skip_existing
 
 # Delete processed files when video file is encoded.
 # --delete_source
@@ -17,10 +17,15 @@
 --halign CENTER --valign BOTTOM
 
 # Output only rolling timestamp
---text_overlay_fmt "Date/Time: {local_timestamp_rolling}"
+--text_overlay_fmt "Date/Time: {{local_timestamp_rolling}}"
 
 # Fast forward through portions where there is no motion detected
 --motion_only
 
 # Encode with x265
 --encoding x265
+
+# Store files in WIDESCREEN_REAR, --merge is not provided hence each event is stored seperately.
+--output "./Movies/WIDESCREEN_REAR/"
+
+--temp_dir ./temp

@@ -89,7 +89,7 @@ Requirements
 This package relies on `ffmpeg <https://ffmpeg.org>`__ to be installed, this is a free, open source cross-platform
 solution to convert video. The created executables for Windows and MacOS include an ffmpeg version.
 
-If not using the executables (Windows and MacOS) then `Python <https://www.python.org>`__ 3.8.6 or higher is required.
+If not using the executables (Windows and MacOS) then `Python <https://www.python.org>`__ 3.9.6 or higher is required.
 
 
 Installation
@@ -832,11 +832,61 @@ These are additional parameters related to the resulting video creation.
 
 *--output <path/filename>*
 
-  Path/filename for the resulting video. If a filename is provided here and --merge is set then the resulting merged
-  video will be saved with this filename. The event videos will be stored within the same folder. To just provide a filename, 
-  but keeping the default folder based on platform, add an extension to the name. For example, providing "event" will create 
-  the files in folder event, but providing "event.mp4" will instead create the movie file event.mp4 in the default folder.
+  Path/filename for the resulting video. If an extention is provided then it will be considered a filename, otherwise it is 
+  considered to be a folder.
+  For example:
+
+    --output events/event
+
+    Results in resulting videos to be stored within folder events/event
+
+
+    --output events/event.mp4
+
+    Results in resulting videos to be stored within folder event in filename event.mp4
+
+  If a filename is provided then --merge is automatically set. If no filename (no extention) is provided then events will be written seperately
+  within the folder unless --merge is provided.
   
+  Path and/or filename can also be a template. 
+  Valid format specifiers:
+  
+    `{layout}`: Layout selected (see --layout), string
+
+    `{current_timestamp}`: Current timestamp based on when template is rendered, string
+
+    `{process_start_timestamp}`: Timestamp when processing of folders started, string
+
+    `{start_timestamp}`: Starting timestamp for the event or movie, string
+    
+    `{end_timestamp}`: Ending timestamp for the event or movie, string
+
+    `{event_timestamp}`: Timestamp from events.json (if provided), string
+
+    `{event_city}`: City name from events.json (if provided), string
+
+    `{event_reason}`: Recording reason from events.json (if provided), string
+
+    `{event_latitude}`: Estimated latitude from events.json (if provided), float
+
+    `{event_longitude}`: Estimated longitude from events.json (if provided), float
+
+*--output_timestamp_format*
+
+  Default: %Y-%m-%d_%H_%M
+
+  Determine how timestamps should be represented within the template provided for --output.
+  For example:
+
+  To merge events in movies grouped by date/hour based on the event timestamp:
+
+      --output "{event_timestamp}.mp4" --output_timestamp_format "%Y-%m-%d_%H"
+  
+  To merge events in movies grouped by event reason (i.e. SENTRY, SAVED) in folders and there by date:
+
+      --output "{event_reason}/{event_timestamp}" --output_timestamp_format "%Y-%m-%d"
+
+      
 *--motion_only*
 
   Default: False
@@ -868,27 +918,9 @@ These are additional parameters related to the resulting video creation.
 
   Default: False
 
-  A video file is created for each event (folder) found. When parameter --merge is provided these individual event
-  video files will then be further merged into 1 bigger video file. 
-  Optionally add a template string to group events together and create multiple video files. Resulting video filename will be based on this template.
-  See --text_overlay_fmt for format variables.
+  A video file is created for each event (folder) found unless --output contains a filename (also see --output).
+  When parameter --merge is provided these individual event video files will then be further merged into 1 bigger video file. 
  
-*--merge_timestamp_format*
-
-  Default: %Y-%m-%d_%H_%M
-
-  Determine how timestamps should be represented within the template provided for --merge.
-  For example:
-
-  To merge events in a movies grouped by date/hour:
-
-      --merge "{event_timestamp}" --merge_timestamp_format "%Y-%m-%d_%H"
-  
-  To merge events in a movies grouped by date:
-
-      --merge "{event_timestamp}" --merge_timestamp_format "%Y-%m-%d"
-  
-
 *--keep-intermediate*
 
   Default: False

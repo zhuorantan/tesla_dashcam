@@ -2,7 +2,7 @@
 # tesla_dashcam <Location of video files> --output <Location to store encoded video files> @DIAMOND.txt
 
 # Skip if encoded file already exist.
---skip_existing
+# --skip_existing
 
 # Delete processed files when video file is encoded.
 # --delete_source
@@ -14,7 +14,7 @@
 --halign RIGHT --valign TOP
 
 # Output city and timestamp
---text_overlay_fmt "City: {event_city}\nDate/Time: {local_timestamp_rolling}"
+--text_overlay_fmt "{% if event_city != '' %}City: {{event_city}}\n{% endif %}Date/Time: {{local_timestamp_rolling}}"
 
 # Fast forward through portions where there is no motion detected
 --motion_only
@@ -25,11 +25,14 @@
 # Set start offset to 120 seconds
 --start_offset 120
 
-# Merge files together
---merge
+# Store files in folders based on layout, extention is provided hence merge all events together based on year/month/date of start timestamp
+--output "./Movies/{{layout}}/Movies/{{start_timestamp|timestamp_format}}.mp4"
 
-# Merge files together
---merge_timestamp_format "%Y-%m"
+# Store the event files in Events folder using default naming
+--output_event "./Movies/{{layout}}/Events"
+
+# Set timestamp to be year/month
+--timestamp_format "%Y-%m-%d"
 
 # Create map
 --title_screen_map
