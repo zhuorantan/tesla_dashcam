@@ -6,7 +6,7 @@ import argparse
 import logging
 import os
 import sys
-from platform import processor as platform_processor
+from platform import processor as platform_processor, architecture
 import json
 from datetime import datetime, timedelta, timezone
 from glob import glob, iglob
@@ -86,7 +86,7 @@ MOVIE_ENCODING = {
     "x264_intel": "h264_qsv",
     "x264_qsv": "h264_qsv",
     "x264_vaapi": "h264_vaapi",
-    "x264_rpi": "h264_omx",
+    "x264_rpi": "h264_v4l2m2m" if architecture()[0] == "64bit" else "h264_omx",
     "x265": "libx265",
     "x265_nvidia": "hevc_nvenc",
     "x265_mac": "hevc_videotoolbox",
@@ -4227,6 +4227,9 @@ def main() -> int:
             video_encoding = video_encoding + ["-b:v", bit_rate]
 
         video_encoding = video_encoding + ["-c:v", MOVIE_ENCODING[encoding]]
+
+        if MOVIE_ENCODING[encoding] == 'h264_v4l2m2m':
+            video_encoding = video_encoding + ["-pix_fmt", "yuv420p"]
     else:
         video_encoding = video_encoding + ["-c:v", args.enc]
 
